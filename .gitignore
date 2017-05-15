@@ -1,0 +1,5 @@
+#ignore comiled files
+*.o
+
+#also a build folder
+build/
