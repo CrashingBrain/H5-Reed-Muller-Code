@@ -12,6 +12,7 @@ char* z[6];
 char* w[7];
 
 void init(){
+	// printf("# INIT #\n");
 	/*Basis vectors for H2*/
 	x[0] = "0000";
 	x[1] = "0011";
@@ -34,19 +35,21 @@ void init(){
 	z[5] = "1111111111111111";
 
 	/*Basis vectors for H5*/
-
+	size_t h5len = 2*strlen(z[5]);
 	for (int i = 1; i < 6; ++i)
 	{
-		w[i+1] = malloc(2*strlen(z[5])*sizeof(char));
+		w[i+1] = malloc((h5len+1)*sizeof(char));
 		strcpy(w[i+1], z[i]);
 		strcat(w[i+1], z[i]);
 	}
-	w[0] = malloc(2*strlen(z[5])*sizeof(char));
+	w[0] = malloc((h5len+1)*sizeof(char));
 	strcpy(w[0], z[0]);
 	strcat(w[0], z[0]);
-	w[1] = malloc(2*strlen(z[5])*sizeof(char));
+	w[1] = malloc((h5len+1)*sizeof(char));
 	strcpy(w[1], z[0]);
-	strcat(w[1], z[1]);
+	strcat(w[1], z[5]);
+
+	// printf("# END INIT #\n");
 
 }
 
@@ -68,11 +71,14 @@ int main(int argc, char const *argv[])
 	printf("Welcome to the H5 (Reed-Muller) test suite\n" );
 	
 	init();
-	printf("%s\n", x[2]);
-	printf("%s\n", y[3]);
-	printf("%s\n", z[4]);
-	printf("%s\n", w[5]);
-	printf("%d\n", strlen(w[5]));
+	printf("x[2] : %s\n", x[2]);
+	printf("y[3] : %s\n", y[3]);
+	printf("z[4] : %s\n", z[4]);
+	printf("Printing w :\n");
+	for (int i = 0; i < 7; ++i)
+	{
+		printf("%s\n", w[i]);
+	}
 
 
 	return 0;
