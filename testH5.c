@@ -11,6 +11,11 @@ char* z[6];
 /*Basis vectors for H5*/
 char* w[7];
 
+char* rowxor(char* a, const char* b);
+char** build_codewords(char** base, int len);
+char char_xor(const char a, const char b);
+void init();
+
 void init(){
 	// printf("# INIT #\n");
 	/*Basis vectors for H2*/
@@ -35,6 +40,7 @@ void init(){
 	z[5] = "1111111111111111";
 
 	/*Basis vectors for H5*/
+	/* Build these from concatenations of the z basis vectors for H4 */
 	size_t h5len = 2*strlen(z[5]);
 	for (int i = 1; i < 6; ++i)
 	{
@@ -52,18 +58,60 @@ void init(){
 	// printf("# END INIT #\n");
 
 }
+/*
+H5 codewords will be built up in the array cw from all combinations of the above w[0-6]. 
+Note that the 6 "message bits" in an H5 codeword (reading from the left and starting at 1)
+are at bit positions 1,2,4,8,16,32. The ordering of codewords in the cw array
+might seem arbitrary but it owes much to Pascal's Triangle - which makes hand-checking easier -
+See assignments to "cw" below.
+*/
+char** build_codewords(char** base, int len){
+	int codedim = 1 << len; /* 2^dim */
+	char** cw = (char**) malloc(codedim*sizeof(char*));
+	int dimword = (1 << (len-1)) + 1; // length of each word of cw (+1 for '\0')
 
-char** build_codewords(char** base, int dim){
-	int codedim = 1 << dim; /* 2^dim */
-	char* result = (char*) malloc(codedim*sizeof(char));
-
-	for (int i = 0; i < dim; ++i)
+	/* This gives the firsts codewords, equals to the base vectors*/
+	for (int i = 0; i < len; ++i)
 	{
-		strcpy(result[i], base[i]);
-
+		cw[i] = (char*) malloc(dimword*sizeof(char));
+		strcpy(cw[i], base[i]);
+		printf("cw[%d]\t: %s\n", i, cw[i]);
+	}
+	/* This gives combinations of two basis vectors */
+	int index = len;
+	for (int i = 1; i < len; i++)
+	{
+		for (int j = i+1; j < len; ++j)
+		{
+			cw[index] = (char*) malloc(dimword*sizeof(char));
+			strcpy(cw[index], cw[i]);
+			cw[index] = rowxor(cw[index], cw[j]);
+			printf("cw[%d]\t: %s\n", index, cw[index]);
+			index++;
+		}
 	}
 
-	return result;
+	return cw;
+}
+
+/* Utility function to 'compute' xor value for char-bit representation */
+char char_xor(const char a, const char b){
+	if ((a=='0' && b == '0') || (a == '1' && b == '1')) return '0';
+	else return '1';
+}
+
+/* Bitwise xor on bit-strings */
+/* a, b must be bitsrings of the same, non-zero, length */
+/* Result is overritten in string a if successful */
+/* otherwise a NULL pointer is returned */
+char* rowxor(char* a, const char* b){
+	int len = strlen(a);
+	if ( strlen(b) == 0 || len != strlen(b)) return NULL;
+	for (int i = 0; i < len; ++i)
+	{
+		a[i] = char_xor(a[i], b[i]);
+	}
+	return a;
 }
 
 int main(int argc, char const *argv[])
@@ -74,12 +122,23 @@ int main(int argc, char const *argv[])
 	printf("x[2] : %s\n", x[2]);
 	printf("y[3] : %s\n", y[3]);
 	printf("z[4] : %s\n", z[4]);
-	printf("Printing w :\n");
+	printf("Printing base vectors... :\n");
 	for (int i = 0; i < 7; ++i)
 	{
 		printf("%s\n", w[i]);
 	}
+	printf("Generating codewords...\n");
+	char** cw = build_codewords(w, 7);
 
 
+close:
+	for (int i = 0; i < 7; ++i)
+	{
+		free(w[i]);
+	}
+	for (int i = 0; i < 64; ++i)
+	{
+		free(cw[i]);
+	}
 	return 0;
 }
