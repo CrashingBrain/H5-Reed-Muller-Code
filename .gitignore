@@ -3,3 +3,8 @@
 
 #also a build folder
 build/
+buildHS/
+
+#ignore vscode stuff
+.vscode/*
+
