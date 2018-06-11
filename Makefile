@@ -4,12 +4,12 @@ testH5:
 
 haskell:
 	mkdir -p buildHS
-	ghc testH5.hs -o buildHS/testH5
+	ghc -c testH5.hs -odir buildHS -o buildHS/testH5
 
 all:
 	make testH5
 	make haskell
 
 clean:
-	rm -r build/*
-	rm -r buildHS/*
+	rm -R build/*
+	rm -R buildHS/*
